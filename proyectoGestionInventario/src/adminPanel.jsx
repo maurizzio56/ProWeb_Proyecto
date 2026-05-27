@@ -1,15 +1,16 @@
+// Importa React para crear componentes
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import Sidebar from './BarraLateral';
 
 const AdminPanel = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('Empleado');
-  const [users, setUsers] = useState([]);
-  const navigate = useNavigate();
+  const [email, setEmail] = useState(''); // Estado para el email del usuario a crear
+  const [password, setPassword] = useState(''); // Estado para la contraseña del usuario a crear
+  const [confirmPassword, setConfirmPassword] = useState(''); // Estado para confirmar la contraseña
+  const [role, setRole] = useState('Empleado'); // Estado para el rol del usuario
+  const [users, setUsers] = useState([]); // Estado para almacenar los usuarios
 
   useEffect(() => {
+    // Carga los usuarios existentes desde el almacenamiento local
     const storedUsers = [];
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith('user_')) {
@@ -18,14 +19,13 @@ const AdminPanel = () => {
           if (userData && userData.email) {
             storedUsers.push(userData);
           }
-        } catch (error) {
-          // skip invalid entries
-        }
+        } catch (error) {}
       }
     });
     setUsers(storedUsers);
   }, []);
 
+  // Maneja el envío del formulario para crear un nuevo usuario
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -50,67 +50,49 @@ const AdminPanel = () => {
     alert('Usuario creado exitosamente');
   };
 
+  // Maneja el cambio del rol seleccionado
   const handleRoleChange = (e) => {
     setRole(e.target.value);
   };
 
   return (
-    <div style={{ padding: '2rem', marginLeft: '250px' }}>
-      <h2>Administrar Usuarios</h2>
-      <p>Desde aquí el administrador puede crear cuentas nuevas de Administrador o Empleado.</p>
-      <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input 
-            type="email" 
-            id="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input 
-            type="password" 
-            id="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="confirmPassword">Confirm Password:</label>
-          <input 
-            type="password" 
-            id="confirmPassword" 
-            value={confirmPassword} 
-            onChange={(e) => setConfirmPassword(e.target.value)} 
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="role">Role:</label>
+    <div className="app-shell">
+      {/* Barra lateral */}
+      <Sidebar />
+      <main className="main-content">
+        <h2>Administrar Usuarios</h2>
+        <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
+          <label htmlFor="email">Correo:</label>
+          <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <br />
+          <label htmlFor="password">Contraseña:</label>
+          <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <br />
+          <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
+          <input type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+          <br />
+          <label htmlFor="role">Rol:</label>
           <select id="role" value={role} onChange={handleRoleChange}>
             <option value="Administrador">Administrador</option>
             <option value="Empleado">Empleado</option>
           </select>
-        </div>
-        <button type="submit">Crear usuario</button>
-      </form>
+          <button type="submit">Crear usuario</button>
+        </form>
 
-      <div>
-        <h3>Usuarios registrados</h3>
-        <ul>
-          {users.length > 0 ? (
-            users.map((user, index) => (
-              <li key={index}>{user.email} - {user.role}</li>
-            ))
-          ) : (
-            <li>No hay usuarios creados.</li>
-          )}
-        </ul>
-      </div>
+        {/* Lista de usuarios registrados */}
+        <div>
+          <h3>Usuarios registrados</h3>
+          <ul>
+            {users.length > 0 ? (
+              users.map((user, index) => (
+                <li key={index}>{user.email} - {user.role}</li>
+              ))
+            ) : (
+              <li>No hay usuarios creados.</li>
+            )}
+          </ul>
+        </div>
+      </main>
     </div>
   );
 };
