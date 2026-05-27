@@ -1,15 +1,19 @@
+// Importa React y los componentes necesarios para manejar rutas
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// Importa los componentes de la aplicación
 import Login from './login';
 import Inventario from './inventario';
 import Panel from './Panel';
 import AdminPanel from './adminPanel';
 
 const App = () => {
-  const userRole = localStorage.getItem('userRole');
+  const userRole = localStorage.getItem('userRole'); // Obtiene el rol del usuario desde el almacenamiento local
 
   return (
     <Router>
+      {/* Configura las rutas de la aplicación */}
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />

@@ -15,7 +15,7 @@ const Register = () => {
       return;
     }
 
-    // Simulamos el registro
+    // Simular el registro
     alert('Registro exitoso. Por favor inicia sesión');
     navigate('/login');
   };

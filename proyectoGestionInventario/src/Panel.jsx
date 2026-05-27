@@ -1,12 +1,13 @@
+// Importa React para crear componentes
 import React, { useState, useEffect } from 'react';
 import Sidebar from './BarraLateral';
 
 const Panel = ({ products = [] }) => {
-  const [inventoryValue, setInventoryValue] = useState(0);
-  const [lowStockProductsCount, setLowStockProductsCount] = useState(0);
-  const [outOfStockProductsCount, setOutOfStockProductsCount] = useState(0);
+  const [inventoryValue, setInventoryValue] = useState(0); // Estado para el valor del inventario
+  const [lowStockProductsCount, setLowStockProductsCount] = useState(0); // Estado para contar los productos con bajo stock
+  const [outOfStockProductsCount, setOutOfStockProductsCount] = useState(0); // Estado para contar los productos agotados
 
-  // Calcular el valor del inventario y los productos con bajo stock
+  // Función para calcular el valor del inventario y los productos con bajo stock
   const calculateInventoryValueAndLowStock = () => {
     let value = 0;
     let lowStockCount = 0;
@@ -23,7 +24,7 @@ const Panel = ({ products = [] }) => {
     setOutOfStockProductsCount(outOfStockCount);
   };
 
-  // Filtrar productos con bajo stock
+  // Filtra productos con bajo stock
   const lowStockProducts = products.filter(product => product.quantity < 10);
 
   useEffect(() => {
@@ -31,28 +32,33 @@ const Panel = ({ products = [] }) => {
   }, [products]);
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div className="app-shell">
+      {/* Barra lateral */}
       <Sidebar />
-      <div style={{ marginLeft: '250px', padding: '1rem' }}>
+      <main className="main-content">
         <h2>Panel</h2>
 
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-          <div style={{ width: '50%', padding: '1rem', border: '1px solid #ccc', textAlign: 'center' }}>
+          {/* Valor del inventario */}
+          <div style={{ width: '50%', padding: '1rem', border: '1px solid #000000', textAlign: 'center' }}>
             Valor de Inventario
             <p>${inventoryValue}</p>
           </div>
 
-          <div style={{ width: '25%', padding: '1rem', border: '1px solid #ccc', textAlign: 'center' }}>
+          {/* Productos con bajo stock */}
+          <div style={{ width: '25%', padding: '1rem', border: '1px solid #000000', textAlign: 'center' }}>
             Stock Bajo
             <p>{lowStockProductsCount} productos</p>
           </div>
 
-          <div style={{ width: '25%', padding: '1rem', border: '1px solid #ccc', textAlign: 'center' }}>
+          {/* Productos agotados */}
+          <div style={{ width: '25%', padding: '1rem', border: '1px solid #000000', textAlign: 'center' }}>
             Productos Agotados
             <p>{outOfStockProductsCount} productos</p>
           </div>
 
-          <div style={{ width: '100%', padding: '1rem', border: '1px solid #ccc', backgroundColor: '#f9f9f9' }}>
+          {/* Lista de productos con bajo stock */}
+          <div style={{ width: '100%', padding: '1rem', border: '1px solid #000000', backgroundColor: '#f9f9f9' }}>
             Productos con Bajo Stock
             <ul>
               {lowStockProducts.map((product, index) => (
@@ -61,7 +67,7 @@ const Panel = ({ products = [] }) => {
             </ul>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
