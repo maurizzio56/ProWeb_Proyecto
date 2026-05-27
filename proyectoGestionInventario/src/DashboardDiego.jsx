@@ -1,112 +1,116 @@
 import React, { useState } from 'react';
 
 export default function DashboardDiego() {
-    
-    const [datosDashboard, setDatosDashboard] = useState({
+    // 1. Datos fieles al prototipo de Figma de la tienda de ropa
+    const [datosDashboard] = useState({
         totalProductos: 145,
         stockBajo: 8,
-        movimientosHoy: 32,
-        
-        actividad: [
-            { dia: 'Lunes', entradas: 12, salidas: 7 },
-            { dia: 'Martes', entradas: 19, salidas: 15 },
-            { dia: 'Miércoles', entradas: 8, salidas: 12 },
-            { dia: 'Jueves', entradas: 15, salidas: 9 },
-            { dia: 'Viernes', entradas: 22, salidas: 14 }
-        ],
+        productosAgregadosHoy: 32,
         
         categorias: [
-            { nombre: 'Electrónica', cantidad: 45, color: '#3498db' },
-            { nombre: 'Lácteos', cantidad: 28, color: '#2ecc71' },
-            { nombre: 'Limpieza', cantidad: 35, color: '#9b59b6' },
-            { nombre: 'Bebidas', cantidad: 37, color: '#f1c40f' }
+            { nombre: 'Polos', cantidad: 45, color: '#3498db' },
+            { nombre: 'Pantalones', cantidad: 28, color: '#2ecc71' },
+            { nombre: 'Casacas', cantidad: 35, color: '#9b59b6' },
+            { nombre: 'Zapatillas', cantidad: 37, color: '#f1c40f' }
+        ],
+
+        alertasStock: [
+            { id: 1, producto: 'Polo Negro - Talla M', stock: 2, estado: 'Crítico' },
+            { id: 2, producto: 'Jean Azul - Talla L', stock: 4, estado: 'Atención' },
+            { id: 3, producto: 'Casaca Cuero - Talla S', stock: 2, estado: 'Crítico' }
         ]
     });
 
-    
-    const estilos = {
-        contenedor: { padding: '20px', backgroundColor: '#f8f9fa', minHeight: '100vh', fontFamily: 'sans-serif' },
-        tituloPrincipal: { color: '#2c3e50', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', marginBottom: '20px' },
-        bloqueTarjetas: { display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '30px' },
-        tarjeta: { flex: '1', minWidth: '200px', background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', borderLeft: '5px solid #3498db' },
-        tarjetaAlerta: { borderLeft: '5px solid #e74c3c' },
-        tarjetaExito: { borderLeft: '5px solid #2ecc71' },
-        numeroMetric: { fontSize: '28px', fontWeight: 'bold', margin: '10px 0 0 0', color: '#333' },
-        bloqueEstadisticas: { display: 'flex', flexWrap: 'wrap', gap: '20px' },
-        cajaGrafico: { flex: '1', minWidth: '300px', background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
-        filaBarra: { display: 'flex', alignItems: 'center', marginBottom: '15px' },
-        nombreEtiqueta: { width: '90px', fontSize: '14px' },
-        fondoBarra: { flex: '1', backgroundColor: '#e2e8f0', height: '20px', borderRadius: '4px', marginRight: '10px', overflow: 'hidden' },
-        tabla: { width: '100%', borderCollapse: 'collapse' },
-        celdaCabecera: { backgroundColor: '#f1f5f9', padding: '10px', textAlign: 'left', borderBottom: '2px solid #cbd5e1' },
-        celdaCuerpo: { padding: '10px', borderBottom: '1px solid #e2e8f0' }
-    };
-
     return (
         <div style={estilos.contenedor}>
-            <h2 style={estilos.tituloPrincipal}>📊 Panel de Control e Indicadores</h2>
-
-            {/* REQ. 3: Indicadores Clave del Panel Principal */}
+            <h2 style={estilos.tituloPrincipal}>Panel de Control e Indicadores</h2>
+            
+            {/* Tarjetas Superiores */}
             <div style={estilos.bloqueTarjetas}>
-                <div style={estilos.tarjeta}>
-                    <p style={{ margin: 0, color: '#7f8c8d', fontSize: '12px', fontWeight: 'bold' }}>TOTAL DE PRODUCTOS</p>
-                    <p style={estilos.numeroMetric}>{datosDashboard.totalProductos}</p>
+                <div style={{ ...estilos.tarjeta, ...estilos.tarjetaNormal }}>
+                    <span style={estilos.numeroMetric}>{datosDashboard.totalProductos}</span>
+                    <p style={estilos.textoEtiqueta}>Total Productos</p>
                 </div>
-
                 <div style={{ ...estilos.tarjeta, ...estilos.tarjetaAlerta }}>
-                    <p style={{ margin: 0, color: '#7f8c8d', fontSize: '12px', fontWeight: 'bold' }}>PRODUCTOS STOCK BAJO</p>
-                    <p style={estilos.numeroMetric}>{datosDashboard.stockBajo} ⚠️</p>
+                    <span style={estilos.numeroMetric}>{datosDashboard.stockBajo}</span>
+                    <p style={estilos.textoEtiqueta}>Stock Bajo</p>
                 </div>
-
                 <div style={{ ...estilos.tarjeta, ...estilos.tarjetaExito }}>
-                    <p style={{ margin: 0, color: '#7f8c8d', fontSize: '12px', fontWeight: 'bold' }}>MOVIMIENTOS DE HOY</p>
-                    <p style={estilos.numeroMetric}>{datosDashboard.movimientosHoy}</p>
+                    <span style={estilos.numeroMetric}>{datosDashboard.productosAgregadosHoy}</span>
+                    <p style={estilos.textoEtiqueta}>Productos Agregados Hoy</p>
                 </div>
             </div>
 
-            {/* REQ. 4: Visualizaciones Gráficas y Estadísticas Básicas en HTML/CSS */}
-            <div style={estilos.bloqueEstadisticas}>
-
-                {/* Gráfico de barras visuales con divs nativos */}
-                <div style={estilos.cajaGrafico}>
-                    <h3 style={{ marginTop: 0, color: '#2c3e50', fontSize: '16px' }}>Monitoreo de Stock por Categoría</h3>
-                    <div style={{ marginTop: '20px' }}>
-                        {datosDashboard.categorias.map((cat, index) => (
-                            <div key={index} style={estilos.filaBarra}>
-                                <span style={estilos.nombreEtiqueta}>{cat.nombre}</span>
-                                <div style={estilos.fondoBarra}>
-                                    <div style={{ width: `${(cat.cantidad / 50) * 100}%`, backgroundColor: cat.color, height: '100%' }}></div>
-                                </div>
-                                <span style={{ fontWeight: 'bold' }}>{cat.cantidad}</span>
-                            </div>
-                        ))}
+            {/* Sección de Gráficos de Categorías */}
+            <div style={estilos.cajaGrafico}>
+                <h3 style={estilos.subtitulo}>Distribución de Stock por Categoría</h3>
+                {datosDashboard.categorias.map((cat, index) => (
+                    <div key={index} style={estilos.filaBarra}>
+                        <span style={estilos.nombreEtiqueta}>{cat.nombre}</span>
+                        <div style={estilos.fondoBarra}>
+                            <div style={{ 
+                                ...estilos.rellenoBarra, 
+                                width: `${(cat.cantidad / 50) * 100}%`, 
+                                backgroundColor: cat.color 
+                            }} />
+                        </div>
+                        <span style={estilos.cantidadTexto}>{cat.cantidad} und</span>
                     </div>
-                </div>
+                ))}
+            </div>
 
-                {/* Resumen estadístico mediante una tabla limpia */}
-                <div style={estilos.cajaGrafico}>
-                    <h3 style={{ marginTop: 0, color: '#2c3e50', fontSize: '16px' }}>Resumen de Actividad Operativa</h3>
-                    <table style={estilos.tabla}>
-                        <thead>
-                            <tr>
-                                <th style={estilos.celdaCabecera}>Día</th>
-                                <th style={estilos.celdaCabecera}>Entradas</th>
-                                <th style={estilos.celdaCabecera}>Salidas</th>
+            {/* Tabla de Alertas de Stock Crítico */}
+            <div style={estilos.cajaGrafico}>
+                <h3 style={estilos.subtitulo}>Productos con Bajo Stock (Alertas)</h3>
+                <table style={estilos.tabla}>
+                    <thead>
+                        <tr>
+                            <th style={estilos.celdaCabecera}>Producto</th>
+                            <th style={estilos.celdaCabecera}>Stock Actual</th>
+                            <th style={estilos.celdaCabecera}>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {datosDashboard.alertasStock.map((item) => (
+                            <tr key={item.id}>
+                                <td style={estilos.celdaCuerpo}>{item.producto}</td>
+                                <td style={{ ...estilos.celdaCuerpo, fontWeight: 'bold', color: '#e74c3c' }}>{item.stock} und</td>
+                                <td style={estilos.celdaCuerpo}>
+                                    <span style={{
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        fontSize: '12px',
+                                        backgroundColor: item.estado === 'Crítico' ? '#fde8e8' : '#fef9c3',
+                                        color: item.estado === 'Crítico' ? '#c81e1e' : '#713f12'
+                                    }}>{item.estado}</span>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {datosDashboard.actividad.map((act, index) => (
-                                <tr key={index}>
-                                    <td style={estilos.celdaCuerpo}><strong>{act.dia}</strong></td>
-                                    <td style={{ ...estilos.celdaCuerpo, color: '#2ecc71' }}>+{act.entradas} u.</td>
-                                    <td style={{ ...estilos.celdaCuerpo, color: '#e74c3c' }}>-{act.salidas} u.</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
 }
+
+const estilos = {
+    contenedor: { padding: '20px', backgroundColor: '#f8f9fa', minHeight: '100vh', fontFamily: 'sans-serif' },
+    tituloPrincipal: { color: '#2c3e50', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', marginBottom: '20px' },
+    subtitulo: { color: '#34495e', marginBottom: '15px' },
+    bloqueTarjetas: { display: 'flex', flexWrap: 'wrap', gap: '20px', marginBottom: '30px' },
+    tarjeta: { flex: '1', minWidth: '200px', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
+    tarjetaNormal: { borderLeft: '5px solid #3498db', backgroundColor: '#fff' },
+    tarjetaAlerta: { borderLeft: '5px solid #e74c3c', backgroundColor: '#fff' },
+    tarjetaExito: { borderLeft: '5px solid #2ecc71', backgroundColor: '#fff' },
+    numeroMetric: { fontSize: '28px', fontWeight: 'bold', margin: '0 0 5px 0', display: 'block', color: '#333' },
+    textoEtiqueta: { margin: 0, color: '#666', fontSize: '14px' },
+    cajaGrafico: { backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '20px' },
+    filaBarra: { display: 'flex', alignItems: 'center', marginBottom: '15px' },
+    nombreEtiqueta: { width: '100px', fontSize: '14px', color: '#333' },
+    fondoBarra: { flex: '1', backgroundColor: '#e2e8f0', height: '20px', borderRadius: '4px', marginRight: '10px', overflow: 'hidden' },
+    rellenoBarra: { height: '100%', borderRadius: '4px', transition: 'width 0.5s ease' },
+    cantidadTexto: { width: '60px', textAlign: 'right', fontSize: '14px', fontWeight: 'bold', color: '#333' },
+    tabla: { width: '100%', borderCollapse: 'collapse' },
+    celdaCabecera: { backgroundColor: '#f1f5f9', padding: '10px', textAlign: 'left', borderBottom: '2px solid #cbd5e1', fontSize: '14px', color: '#475569' },
+    celdaCuerpo: { padding: '12px 10px', borderBottom: '1px solid #e2e8f0', fontSize: '14px', color: '#334155' }
+};
