@@ -1,6 +1,5 @@
-// Importa React y useNavigate para navegar entre rutas
+// Importa React para crear componentes
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Sidebar from './BarraLateral';
 
 const AdminPanel = () => {
@@ -9,7 +8,6 @@ const AdminPanel = () => {
   const [confirmPassword, setConfirmPassword] = useState(''); // Estado para confirmar la contraseña
   const [role, setRole] = useState('Empleado'); // Estado para el rol del usuario
   const [users, setUsers] = useState([]); // Estado para almacenar los usuarios
-  const navigate = useNavigate(); // Hook para navegar entre rutas
 
   useEffect(() => {
     // Carga los usuarios existentes desde el almacenamiento local

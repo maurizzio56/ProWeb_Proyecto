@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Sidebar from './BarraLateral';
 
 export default function DashboardDiego() {
     
@@ -43,10 +44,12 @@ export default function DashboardDiego() {
     };
 
     return (
-        <div style={estilos.contenedor}>
-            <h2 style={estilos.tituloPrincipal}>📊 Panel de Control e Indicadores</h2>
+        <div className="app-shell">
+            <Sidebar />
+            <main className="main-content" style={{ padding: '20px', backgroundColor: 'transparent', minHeight: 'auto', fontFamily: 'sans-serif' }}>
+                <h2 style={estilos.tituloPrincipal}>📊 Panel de Control e Indicadores</h2>
 
-            {/* REQ. 3: Indicadores Clave del Panel Principal */}
+                {/* REQ. 3: Indicadores Clave del Panel Principal */}
             <div style={estilos.bloqueTarjetas}>
                 <div style={estilos.tarjeta}>
                     <p style={{ margin: 0, color: '#7f8c8d', fontSize: '12px', fontWeight: 'bold' }}>TOTAL DE PRODUCTOS</p>
@@ -107,6 +110,7 @@ export default function DashboardDiego() {
                 </div>
 
             </div>
-        </div>
+        </main>
+    </div>
     );
 }

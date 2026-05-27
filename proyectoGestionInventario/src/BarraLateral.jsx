@@ -21,6 +21,9 @@ const Sidebar = () => {
           <li>
             <button type="button" onClick={() => navigate('/panel')}>Panel</button>
           </li>
+          <li>
+            <button type="button" onClick={() => navigate('/dashboard')}>Dashboard</button>
+          </li>
           {userRole === 'Administrador' && (
             <li>
               <button type="button" onClick={() => navigate('/admin')}>Administrar usuarios</button>

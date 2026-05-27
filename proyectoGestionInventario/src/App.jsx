@@ -7,6 +7,7 @@ import Login from './login';
 import Inventario from './inventario';
 import Panel from './Panel';
 import AdminPanel from './adminPanel';
+import DashboardDiego from './DashboardDiego';
 
 const App = () => {
   const userRole = localStorage.getItem('userRole'); // Obtiene el rol del usuario desde el almacenamiento local
@@ -24,6 +25,10 @@ const App = () => {
         <Route
           path="/panel"
           element={userRole === 'Administrador' || userRole === 'Empleado' ? <Panel /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/dashboard"
+          element={userRole === 'Administrador' || userRole === 'Empleado' ? <DashboardDiego /> : <Navigate to="/login" />}
         />
         <Route
           path="/admin"
