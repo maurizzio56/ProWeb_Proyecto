@@ -10,6 +10,8 @@ import AdminPanel from './adminPanel';
 import DashboardDiego from './DashboardDiego';
 import Movimientos from './Movimientos';
 import Proveedores from './Proveedores';
+import Solicitudes from './solicitudes';
+import Reabastecimiento from './reabastecimiento';
 
 const App = () => {
   const userRole = localStorage.getItem('userRole'); // Obtiene el rol del usuario desde el almacenamiento local
@@ -39,6 +41,18 @@ const App = () => {
         <Route
           path="/dashboard"
           element={userRole === 'Administrador' || userRole === 'Empleado' ? <DashboardDiego /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/solicitudes"
+          element={
+            userRole === 'Administrador' || userRole === 'Empleado'
+              ? <Solicitudes />
+              : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/reabastecimiento"
+          element={userRole === 'Administrador' || userRole === 'Empleado' ? <Reabastecimiento /> : <Navigate to="/login" />}
         />
         <Route
           path="/admin"

@@ -1,0 +1,159 @@
+.reab-page {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f6fb;
+  font-family: Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+.reab-content {
+  margin-left: 250px;
+  padding: 32px;
+  min-height: 100vh;
+  background: #f5f6fb;
+  flex: 1;
+}
+
+.reab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+
+.reab-header div {
+  max-width: 70%;
+}
+
+.reab-header h1 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.reab-header p {
+  margin-top: 6px;
+  color: #6b7280;
+}
+
+.reab-btn {
+  background: #6c4df6;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.reab-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.reab-card {
+  background: white;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(31, 41, 55, 0.08);
+}
+
+.reab-card span {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.reab-card h2 {
+  margin: 10px 0 0;
+  font-size: 30px;
+  color: #111827;
+}
+
+.reab-table-card {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(31, 41, 55, 0.08);
+}
+
+.reab-table-card h2 {
+  margin-top: 0;
+  color: #1f2937;
+  text-align: center;
+}
+
+.reab-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reab-table th,
+.reab-table td {
+  padding: 14px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.reab-table th {
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.reab-table td {
+  border-bottom: 1px solid #f0f0f0;
+  color: #374151;
+}
+
+.reab-table th:first-child,
+.reab-table td:first-child {
+  text-align: left;
+}
+
+.badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.alta {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.media {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.pendiente {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.proceso {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f6fb;
+}
+
+.reab-content {
+  margin-left: 250px;
+  padding: 32px;
+  min-height: 100vh;
+  background: #f5f6fb;
+  width: calc(100% - 250px);
+}

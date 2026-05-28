@@ -1,40 +1,53 @@
-// Importa React y useNavigate para navegar entre rutas
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [email, setEmail] = useState(''); // Estado para el email del usuario
-  const [password, setPassword] = useState(''); // Estado para la contraseña del usuario
-  const navigate = useNavigate(); // Hook para navegar entre rutas
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  // Maneja el envío del formulario de inicio de sesión
-  const handleSubmit = (e) => {
+  const handleSubmit=(e) => {
     e.preventDefault();
+    
     const storedUserData = localStorage.getItem(`user_${email}`);
     const storedUser = storedUserData ? JSON.parse(storedUserData) : null;
 
     if (email === 'admin@example.com' && password === 'admin123') {
       localStorage.setItem('userRole', 'Administrador');
-      navigate('/panel');
+      navigate('/dashboard');
     } else if (storedUser && storedUser.password === password) {
       localStorage.setItem('userRole', storedUser.role);
-      navigate('/panel');
+      navigate('/dashboard');
     } else {
       alert('Credenciales inválidas');
     }
-  };
+  }
 
   return (
     <div>
-      <h2>Iniciar Sesión</h2>
+      <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <label>Email:</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <br />
-        <label>Contraseña:</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <br />
-        <button type="submit">Ingresar</button>
+        <div>
+          <label htmlFor="email">Email:</label>
+          <input 
+            type="email" 
+            id="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Password:</label>
+          <input 
+            type="password" 
+            id="password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required
+          />
+        </div>
+        <button type="submit">Login</button>
       </form>
     </div>
   );
