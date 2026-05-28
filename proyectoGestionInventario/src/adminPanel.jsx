@@ -1,16 +1,14 @@
-// Importa React para crear componentes
 import React, { useState, useEffect } from 'react';
 import Sidebar from './BarraLateral';
 
 const AdminPanel = () => {
-  const [email, setEmail] = useState(''); // Estado para el email del usuario a crear
-  const [password, setPassword] = useState(''); // Estado para la contraseña del usuario a crear
-  const [confirmPassword, setConfirmPassword] = useState(''); // Estado para confirmar la contraseña
-  const [role, setRole] = useState('Empleado'); // Estado para el rol del usuario
-  const [users, setUsers] = useState([]); // Estado para almacenar los usuarios
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('Empleado');
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    // Carga los usuarios existentes desde el almacenamiento local
     const storedUsers = [];
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith('user_')) {
@@ -25,7 +23,6 @@ const AdminPanel = () => {
     setUsers(storedUsers);
   }, []);
 
-  // Maneja el envío del formulario para crear un nuevo usuario
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -50,47 +47,78 @@ const AdminPanel = () => {
     alert('Usuario creado exitosamente');
   };
 
-  // Maneja el cambio del rol seleccionado
-  const handleRoleChange = (e) => {
-    setRole(e.target.value);
-  };
-
   return (
     <div className="app-shell">
-      {/* Barra lateral */}
       <Sidebar />
+      
       <main className="main-content">
-        <h2>Administrar Usuarios</h2>
-        <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
-          <label htmlFor="email">Correo:</label>
-          <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <br />
-          <label htmlFor="password">Contraseña:</label>
-          <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <br />
-          <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
-          <input type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-          <br />
-          <label htmlFor="role">Rol:</label>
-          <select id="role" value={role} onChange={handleRoleChange}>
-            <option value="Administrador">Administrador</option>
-            <option value="Empleado">Empleado</option>
-          </select>
-          <button type="submit">Crear usuario</button>
-        </form>
+        <div style={{ marginBottom: '32px' }}>
+          <h1 className="titulo-pagina">Administrar Usuarios</h1>
+          <p className="subtitulo-pagina">Crea y gestiona las cuentas de acceso de los empleados.</p>
+        </div>
 
-        {/* Lista de usuarios registrados */}
-        <div>
-          <h3>Usuarios registrados</h3>
-          <ul>
-            {users.length > 0 ? (
-              users.map((user, index) => (
-                <li key={index}>{user.email} - {user.role}</li>
-              ))
-            ) : (
-              <li>No hay usuarios creados.</li>
-            )}
-          </ul>
+        <div className="admin-grid">
+          {/* Columna Izquierda: Formulario */}
+          <section className="tarjeta">
+            <h2 className="titulo-seccion" style={{ marginBottom: '20px' }}>Nuevo Usuario</h2>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label htmlFor="email" className="label-formulario">Correo Electrónico:</label>
+                <input type="email" id="email" className="input-formulario" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </div>
+              
+              <div>
+                <label htmlFor="password" className="label-formulario">Contraseña:</label>
+                <input type="password" id="password" className="input-formulario" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="label-formulario">Confirmar Contraseña:</label>
+                <input type="password" id="confirmPassword" className="input-formulario" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              </div>
+
+              <div>
+                <label htmlFor="role" className="label-formulario">Rol del Sistema:</label>
+                <select id="role" className="select-formulario" value={role} onChange={(e) => setRole(e.target.value)}>
+                  <option value="Administrador">Administrador</option>
+                  <option value="Empleado">Empleado</option>
+                </select>
+              </div>
+
+              <button type="submit" className="btn-primario" style={{ marginTop: '8px' }}>Crear usuario</button>
+            </form>
+          </section>
+
+          {/* Columna Derecha: Tabla de usuarios registrados */}
+          <section className="tabla-card" style={{ width: '100%', margin: '0' }}>
+            <h2 className="titulo-seccion" style={{ marginBottom: '20px', textAlign: 'left' }}>Usuarios Registrados</h2>
+            <table className="tabla-solicitudes">
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left' }}>Email</th>
+                  <th>Rol Asignado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.length > 0 ? (
+                  users.map((user, index) => (
+                    <tr key={index}>
+                      <td style={{ textAlign: 'left', fontWeight: '500' }}>{user.email}</td>
+                      <td>
+                        <span className={`badge ${user.role === 'Administrador' ? 'pendiente' : 'proceso'}`} style={{ padding: '6px 12px', borderRadius: '12px', fontSize: '13px', fontWeight: 'bold' }}>
+                          {user.role}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="2" style={{ color: 'var(--text-muted)' }}>No hay usuarios creados.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
         </div>
       </main>
     </div>

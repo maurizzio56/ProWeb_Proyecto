@@ -6,7 +6,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit=(e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     
     const storedUserData = localStorage.getItem(`user_${email}`);
@@ -21,34 +21,48 @@ const Login = () => {
     } else {
       alert('Credenciales inválidas');
     }
-  }
+  };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input 
-            type="email" 
-            id="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required
-          />
+    <div className="login-container">
+      <div className="tarjeta" style={{ width: '100%', maxWidth: '400px', padding: '40px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h1 className="titulo-pagina" style={{ fontSize: '24px', marginBottom: '8px' }}>StyleFlow</h1>
+          <p className="subtitulo-pagina">Gestión de Inventario Profesional</p>
         </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input 
-            type="password" 
-            id="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <label htmlFor="email" className="label-formulario">USUARIO</label>
+            <input 
+              type="email" 
+              id="email" 
+              className="input-formulario"
+              placeholder="admin@styleflow.com"
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="label-formulario">CONTRASEÑA</label>
+            <input 
+              type="password" 
+              id="password" 
+              className="input-formulario"
+              placeholder="password"
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn-primario" style={{ width: '100%', marginTop: '8px' }}>
+            Iniciar Sesión
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

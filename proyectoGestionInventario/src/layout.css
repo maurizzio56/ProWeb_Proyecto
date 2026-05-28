@@ -86,6 +86,11 @@ a {
     padding-top: 32px;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
     z-index: 10;
+
+    /* Activamos Flexbox en la barra completa */
+    display: flex;
+    flex-direction: column;
+    height: 100vh;            
 }
 
 .sidebar-nav {
@@ -97,7 +102,9 @@ a {
     margin: 0;
 }
 
-.sidebar-nav button {
+/* Estilos unificados para todos los botones del menú */
+.sidebar-nav button,
+.logout-btn {
     width: 100%;
     padding: 14px 20px;
     background: transparent;
@@ -106,6 +113,7 @@ a {
     border: none;
     font-size: 0.95rem;
     transition: background 0.2s ease;
+    cursor: pointer;
 }
 
 .sidebar-nav button:hover {
@@ -114,6 +122,22 @@ a {
 
 .sidebar-nav button.active {
     background: rgba(255, 255, 255, 0.12);
+}
+
+/* El contenedor del fondo */
+.sidebar-footer {
+    margin-top: auto; /* Esta línea empuja el contenedor mágicamente al fondo */
+    padding-bottom: 20px; /* Despegado sutil del borde inferior */
+    border-top: 1px solid rgba(255, 255, 255, 0.05); /* Línea divisoria muy fina */
+}
+
+/* Estilo específico para el botón de cerrar sesión */
+.logout-btn {
+    color: #fca5a5; /* Un tono rojo/salmón suave que combina con el modo oscuro */
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1); /* Efecto hover rojizo transparente */
 }
 
 .app-shell,
@@ -312,6 +336,12 @@ a {
     box-sizing: border-box;
     background-color: white;
     color: #111827;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-formulario:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(108, 77, 246, 0.15);
 }
 
 .input-formulario::placeholder {
@@ -374,4 +404,97 @@ a {
     .reab-cards {
         grid-template-columns: 1fr;
     }
+}
+
+
+/* ==========================================================================
+   EXTENSIONES NUEVAS: LOGIN, ADMIN PANEL Y FORMULARIOS
+   ========================================================================== */
+
+/* Contenedor para centrar de forma exacta el formulario de login estilo mockup */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #0b1020; /* El fondo oscuro de tu mockup de login */
+    padding: 20px;
+}
+
+/* Rejilla para dividir el Admin Panel en dos columnas (Formulario izquierda, Tabla derecha) */
+.admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 32px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Etiquetas de los inputs */
+.label-formulario {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Selector desplegable estilizado idéntico a tus inputs */
+.select-formulario {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    font-size: 15px;
+    box-sizing: border-box;
+    background-color: white;
+    color: #111827;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.select-formulario:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(108, 77, 246, 0.15);
+}
+
+/* Estilos de títulos para mantener consistencia */
+.titulo-pagina {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.subtitulo-pagina {
+    color: var(--text-muted);
+    margin: 4px 0 0 0;
+    font-size: 14px;
+}
+
+.titulo-seccion {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+/* Botón primario grande */
+.btn-primario {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    width: 100%;
+}
+
+.btn-primario:hover {
+    background: #563bc7;
 }
