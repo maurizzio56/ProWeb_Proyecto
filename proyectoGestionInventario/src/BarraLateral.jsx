@@ -7,31 +7,16 @@ const Sidebar = () => {
   const userRole = localStorage.getItem('userRole');
 
   return (
-    <aside className="sidebar">
-      {/* Barra lateral con opciones de navegación */}
-      <div className="sidebar-brand">Gestión</div>
-      <nav>
-        <ul className="sidebar-nav">
-          <li>
-            <button type="button" onClick={() => navigate('/login')}>Login</button>
-          </li>
-          <li>
-            <button type="button" onClick={() => navigate('/inventario')}>Inventario</button>
-          </li>
-          <li>
-            <button type="button" onClick={() => navigate('/panel')}>Panel</button>
-          </li>
-          <li>
-            <button type="button" onClick={() => navigate('/dashboard')}>Dashboard</button>
-          </li>
-          {userRole === 'Administrador' && (
-            <li>
-              <button type="button" onClick={() => navigate('/admin')}>Administrar usuarios</button>
-            </li>
-          )}
-        </ul>
-      </nav>
-    </aside>
+    <div style={{ width: '250px', position: 'fixed', top: '0', bottom: '0', left: '0', backgroundColor: '#f4f4f4' }}>
+      <ul style={{ listStyleType: 'none', padding: '0' }}>
+        <li onClick={() => navigate('/login')} style={{ padding: '10px 20px', cursor: 'pointer' }}>Login</li>
+        <li onClick={() => navigate('/inventario')} style={{ padding: '10px 20px', cursor: 'pointer' }}>Inventario</li>
+        <li onClick={() => navigate('/panel')} style={{ padding: '10px 20px', cursor: 'pointer' }}>Panel</li>
+        {userRole === 'Administrador' && (
+          <li onClick={() => navigate('/admin')} style={{ padding: '10px 20px', cursor: 'pointer' }}>Administrar usuarios</li>
+        )}
+      </ul>
+    </div>
   );
 };
 
