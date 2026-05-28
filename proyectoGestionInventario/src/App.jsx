@@ -4,6 +4,8 @@ import Login from './login';
 import Inventario from './inventario';
 import Panel from './Panel';
 import AdminPanel from './adminPanel';
+import Movimientos from './movimientos';
+import Proveedores from './Proveedores';
 
 const App = () => {
   const userRole = localStorage.getItem('userRole');
@@ -20,6 +22,15 @@ const App = () => {
         <Route
           path="/panel"
           element={userRole === 'Administrador' || userRole === 'Empleado' ? <Panel /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/movimientos"
+          element={userRole === 'Administrador' || userRole === 'Empleado'? <Movimientos /> : <Navigate to="/login" />}
+        />
+
+        <Route
+          path="/proveedores"
+          element={userRole === 'Administrador' || userRole === 'Empleado'  ? <Proveedores /> : <Navigate to="/login" />}
         />
         <Route
           path="/admin"
