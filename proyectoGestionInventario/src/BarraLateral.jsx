@@ -15,12 +15,12 @@ const Sidebar = () => {
 return (
   <div className="sidebar">
     <ul className="sidebar-nav">
+      <li><button type="button" onClick={() => navigate('/dashboard')}>Panel de Control</button></li>
       <li><button type="button" onClick={() => navigate('/inventario')}>Inventario</button></li>
-      <li><button type="button" onClick={() => navigate('/solicitudes')}>Solicitudes</button></li>
       <li><button type="button" onClick={() => navigate('/reabastecimiento')}>Reabastecimiento</button></li>
       <li><button type="button" onClick={() => navigate('/movimientos')}>Movimientos</button></li>
       <li><button type="button" onClick={() => navigate('/proveedores')}>Proveedores</button></li>
-      <li><button type="button" onClick={() => navigate('/dashboard')}>Dashboard</button></li>
+      <li><button type="button" onClick={() => navigate('/solicitudes')}>Solicitudes</button></li>
       {userRole === 'Administrador' && (
         <li><button type="button" onClick={() => navigate('/admin')}>Administrar usuarios</button></li>
       )}
