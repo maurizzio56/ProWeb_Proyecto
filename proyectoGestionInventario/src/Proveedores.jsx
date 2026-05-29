@@ -68,6 +68,11 @@ const Proveedores = () => {
   const [filterProduct, setFilterProduct] = useState('Todos');
   const [filterType, setFilterType] = useState('Todos');
 
+  // ── NUEVO: estado para el modal de confirmación ──────────────────────────
+  // Guarda el índice del proveedor que se quiere eliminar (null = modal cerrado)
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  // ─────────────────────────────────────────────────────────────────────────
+
   // INPUTS
   function handleChange(event) {
 
@@ -134,16 +139,30 @@ const Proveedores = () => {
 
   }
 
-  // ELIMINAR
+  // ── NUEVO: abre el modal en lugar de eliminar directamente ───────────────
   function handleDelete(index) {
+    setConfirmDelete(index);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // ── NUEVO: ejecuta la eliminación real cuando el usuario confirma ────────
+  function confirmDeleteAction() {
 
     const updatedProviders = providers.filter(function (_, i) {
-      return i !== index;
+      return i !== confirmDelete;
     });
 
     setProviders(updatedProviders);
+    setConfirmDelete(null);
 
   }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // ── NUEVO: cancela y cierra el modal ─────────────────────────────────────
+  function cancelDelete() {
+    setConfirmDelete(null);
+  }
+  // ─────────────────────────────────────────────────────────────────────────
 
   // FILTRADO
   let filteredProviders = providers;
@@ -623,7 +642,7 @@ const Proveedores = () => {
 
                         </td>
 
-                        {/* ELIMINAR */}
+                        {/* ── MODIFICADO: ahora llama a handleDelete que abre el modal ── */}
                         <td>
 
                           <button
@@ -644,6 +663,7 @@ const Proveedores = () => {
                           </button>
 
                         </td>
+                        {/* ───────────────────────────────────────────────────────────── */}
 
                       </tr>
 
@@ -677,6 +697,118 @@ const Proveedores = () => {
         </div>
 
       </main>
+
+      {/* ── NUEVO: Modal de confirmación de eliminación ──────────────────────── */}
+      {confirmDelete !== null && (
+
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '32px',
+              maxWidth: '400px',
+              width: '90%',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+              textAlign: 'center'
+            }}
+          >
+
+            {/* Ícono de advertencia */}
+            <div
+              style={{
+                fontSize: '48px',
+                marginBottom: '16px'
+              }}
+            >
+              ⚠️
+            </div>
+
+            <h3
+              style={{
+                margin: '0 0 12px 0',
+                fontSize: '18px',
+                fontWeight: '600',
+                color: '#1a1a1a'
+              }}
+            >
+              ¿Estás seguro?
+            </h3>
+
+            <p
+              style={{
+                margin: '0 0 28px 0',
+                color: '#555',
+                fontSize: '14px',
+                lineHeight: '1.5'
+              }}
+            >
+              Estás a punto de eliminar al proveedor{' '}
+              <strong>{providers[confirmDelete]?.name}</strong>.
+              Esta acción no se puede deshacer.
+            </p>
+
+            <div
+              style={{
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'center'
+              }}
+            >
+
+              {/* Botón Cancelar */}
+              <button
+                onClick={cancelDelete}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  backgroundColor: 'white',
+                  color: '#333',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Cancelar
+              </button>
+
+              {/* Botón Sí, eliminar */}
+              <button
+                onClick={confirmDeleteAction}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Sí, eliminar
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+      {/* ─────────────────────────────────────────────────────────────────────── */}
 
     </div>
 
