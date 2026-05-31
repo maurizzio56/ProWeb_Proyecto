@@ -1,0 +1,17 @@
+// CÓDIGO ANTES (Propenso a fallas críticas si existían otras claves en el navegador)
+Object.keys(localStorage).forEach((key) => {
+  const userData = JSON.parse(localStorage.getItem(key));
+  storedUsers.push(userData);
+});
+
+// CÓDIGO SUGERIDO POR IA (Implementado en AdminPanel.jsx)
+Object.keys(localStorage).forEach((key) => {
+  if (key.startsWith('user_')) { // Filtro de seguridad
+    try {
+      const userData = JSON.parse(localStorage.getItem(key));
+      if (userData && userData.email) {
+        storedUsers.push(userData);
+      }
+    } catch (error) {} // Captura y aislamiento del error
+  }
+});
