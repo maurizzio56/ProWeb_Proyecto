@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'; 
 import Sidebar from './BarraLateral';
+import './inventario.css';
 
 const Inventario = () => {
   const [product, setProduct] = useState({
@@ -23,7 +24,6 @@ const Inventario = () => {
   const handleChange = (event) => {
     setProduct({ ...product, [event.target.name]: event.target.value });
   };
-
   const handleSubmit = (event) => {
     event.preventDefault();
     if (product.name && product.marca && product.type) {
@@ -40,6 +40,7 @@ const Inventario = () => {
         type: '',
         sizes: ''  
       });
+      setPopup(false);
     } else {
       alert('Por favor, complete todos los campos.');
     }
@@ -122,11 +123,19 @@ const Inventario = () => {
           </label>
           <br />
 
-          <label>
-            Marca:
-            <input type="text" name="marca" value={product.marca} onChange={handleChange} />
-          </label>
-          <br />
+          {/* RIGHT COLUMN - Product Details & Other Content */}
+          <div className="right-column">
+            {selectedProduct ? (
+              <div className="product-detail-section">
+                <h3>Detalles del Producto</h3>
+                {displayProduct(selectedProduct)}
+              </div>
+            ) : (
+              <div className="empty-state">
+                <p>Selecciona un producto para ver sus detalles</p>
+              </div>
+            )}
+          </div>
 
           <label>Tipo de Prenda: </label>
           {/* Corregido: En React se usa defaultValue o se maneja el string vacío directamente para evitar warnings */}
@@ -141,13 +150,43 @@ const Inventario = () => {
           </select>
           <br />
 
-          <button type="submit">Crear Producto</button>
-          <br />
-        </form>
+        {/* POPUP - stays the same */}
+        {showPopup && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+              <h2>Registro de Productos</h2>
+              <form onSubmit={handleSubmit}>
+                <label>
+                  Nombre del Producto:
+                  <input type="text" name="name" value={product.name} onChange={handleChange} />
+                </label>
+                <br />
+          
+                <label>
+                  Marca:
+                  <input type="text" name="marca" value={product.marca} onChange={handleChange} />
+                </label>
+                <br />
 
-        {renderProductList()}
-        
-        {selectedProduct && displayProduct(selectedProduct)}
+                <label>Tipo de Prenda: </label>
+                <select name="type" value={product.type} onChange={handleChange}>
+                  <option value="" disabled></option>
+                  <option value="Casaca">Casaca</option>
+                  <option value="Medias">Medias</option>
+                  <option value="Pantalon">Pantalon</option>
+                  <option value="Polera">Polera</option>
+                  <option value="Polo">Polo</option>
+                  <option value="Shorts">Shorts</option>
+                </select>
+                <br />
+                <div className="popup-buttons">
+                  <button type="submit" className="btn-primario">Crear</button>
+                  <button onClick={() => cancelReg()} className='btn-secundario'>Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
