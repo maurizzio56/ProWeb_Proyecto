@@ -1,0 +1,16 @@
+[
+  {
+  "producto": "Polo Deportivo Nike",
+  "talla": "M",
+  "cantidad": 15,
+  "prioridad": "Alta",
+  "estado": "Aprobada"
+},
+  {
+    "producto": "Casaca Invierno",
+    "talla": "L",
+    "cantidad": 8,
+    "prioridad": "Media",
+    "estado": "Pendiente de aprobación"
+  }
+]

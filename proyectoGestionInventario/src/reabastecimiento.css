@@ -6,24 +6,31 @@
   overflow-x: hidden;
 }
 
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f6fb;
+}
+
 .reab-content {
   margin-left: 250px;
   padding: 32px;
   min-height: 100vh;
   background: #f5f6fb;
-  flex: 1;
+  width: calc(100% - 250px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .reab-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  gap: 20px;
-}
-
-.reab-header div {
-  max-width: 70%;
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto 30px auto;
 }
 
 .reab-header h1 {
@@ -31,28 +38,16 @@
   color: #1f2937;
   font-size: 28px;
   line-height: 1.1;
-}
-
-.reab-header p {
-  margin-top: 6px;
-  color: #6b7280;
-}
-
-.reab-btn {
-  background: #6c4df6;
-  color: white;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
+  text-align: left;
 }
 
 .reab-cards {
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
-  margin-bottom: 24px;
 }
 
 .reab-card {
@@ -74,6 +69,9 @@
 }
 
 .reab-table-card {
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto;
   background: white;
   padding: 24px;
   border-radius: 16px;
@@ -113,47 +111,11 @@
   text-align: left;
 }
 
-.badge {
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.alta {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-.media {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.pendiente {
-  background: #ede9fe;
-  color: #5b21b6;
-}
-
-.proceso {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100vh;
-  background: #f5f6fb;
-}
-
-.reab-content {
-  margin-left: 250px;
-  padding: 32px;
-  min-height: 100vh;
-  background: #f5f6fb;
-  width: calc(100% - 250px);
+.btn-completar {
+  background-color: #22c55e;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
 }
