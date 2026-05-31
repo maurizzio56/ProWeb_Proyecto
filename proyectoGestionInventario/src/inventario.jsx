@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState } from 'react';
 import Sidebar from './BarraLateral';
 import './inventario.css';
 
@@ -9,21 +9,14 @@ const Inventario = () => {
     type: '',
     sizes: ''
   }); 
-
-  const [products, setProducts] = useState(() => {
-    const savedProducts = localStorage.getItem('inventario_productos');
-    return savedProducts ? JSON.parse(savedProducts) : [];
-  }); 
-  
-  const [selectedProduct, setSelectedProduct] = useState(null);  
-
-  useEffect(() => {
-    localStorage.setItem('inventario_productos', JSON.stringify(products));
-  }, [products]);
+  const [products, setProducts] = useState([]); 
+  const [selectedProduct, setSelectedProduct] = useState(null); 
+  const [showPopup, setPopup] = useState(false);
 
   const handleChange = (event) => {
     setProduct({ ...product, [event.target.name]: event.target.value });
   };
+    
   const handleSubmit = (event) => {
     event.preventDefault();
     if (product.name && product.marca && product.type) {
@@ -32,7 +25,6 @@ const Inventario = () => {
         ...product,           
         sizes: sizesArray     
       };
-     
       setProducts([...products, newProduct]);
       setProduct({
         name: '',
@@ -49,7 +41,7 @@ const Inventario = () => {
   const displayProduct = (item) => {
     const index = products.findIndex(p => p === item);
     return (
-      <div>
+      <div className="product-detail">
         <h3>{item.name}</h3>
         <p>Marca: {item.marca}</p>
         <p>Tipo: {item.type}</p>
@@ -71,7 +63,7 @@ const Inventario = () => {
           </tbody>
         </table>
         <br />
-        <button onClick={() => deleteProduct(index)}>Eliminar Producto</button>
+        <button className='btn-secundario' onClick={() => deleteProduct(index)} >Eliminar Producto</button>
       </div>
     );
   };
@@ -80,13 +72,33 @@ const Inventario = () => {
     switch(type) {
       case 'Pantalon':
       case 'Shorts':
-        return [['28', 0], ['30', 0], ['32', 0], ['34', 0], ['36', 0], ['38', 0], ['40', 0], ['42', 0]];
+        return [
+          ['28', 0], 
+          ['30', 0],
+          ['32', 0], 
+          ['34', 0],
+          ['36', 0], 
+          ['38', 0], 
+          ['40', 0], 
+          ['42', 0]
+        ];
       case 'Medias':
-        return [['34-35', 0], ['35-36', 0], ['37-38', 0], ['39-40', 0], ['41-42', 0]];
+        return [
+          ['34-35', 0], 
+          ['35-36', 0], 
+          ['37-38', 0], 
+          ['39-40', 0], 
+          ['41-42', 0]
+        ];
       case 'Casaca':
       case 'Polera':
       case 'Polo':
-        return [['S', 0], ['M', 0], ['L', 0], ['XL', 0]];
+        return [
+          ['S', 0], 
+          ['M', 0], 
+          ['L', 0], 
+          ['XL', 0]
+        ];
       default:
         return [];
     }
@@ -94,12 +106,11 @@ const Inventario = () => {
 
   const renderProductList = () => {
     return products.map((item, index) => (
-
-      <p key={index}>
-        <button onClick={() => setSelectedProduct(item)}>
+      <div key={index} className="product-item">
+        <button onClick={() => setSelectedProduct(item)} className="btn-producto">
           {item.name} - {item.type} - {item.marca}
         </button>
-      </p>
+      </div>
     ));
   };
 
@@ -109,19 +120,39 @@ const Inventario = () => {
     setSelectedProduct(null);
   };
 
+  const cancelReg = () => {
+    setProduct({
+      name: '',
+      marca: '',
+      type: '',
+      sizes: ''  
+    });
+    setPopup(false);
+  }
+
   return (
-    <div className="app-shell">
+    <div className="app-shell inventario-container">
       <Sidebar />
       <main className="main-content">
         <h2>Inventario</h2>
         <p>Bienvenido al sistema de gestión de inventario</p>
 
-        <form onSubmit={handleSubmit}>
-          <label>
-            Nombre del Producto:
-            <input type="text" name="name" value={product.name} onChange={handleChange} />
-          </label>
-          <br />
+        {/* TWO COLUMN LAYOUT */}
+        <div className="two-columns">
+          
+          {/* LEFT COLUMN - Product List */}
+          <div className="left-column">
+            <div className="product-list-header">
+              <h3>Lista de Productos</h3>
+              <button onClick={() => setPopup(true)} className="btn-primario">+ Agregar Producto</button>
+            </div>
+            <div className="product-list">
+              {renderProductList()}
+              {products.length === 0 && (
+                <p className="empty-message">No hay productos. Agrega uno nuevo.</p>
+              )}
+            </div>
+          </div>
 
           {/* RIGHT COLUMN - Product Details & Other Content */}
           <div className="right-column">
@@ -137,18 +168,7 @@ const Inventario = () => {
             )}
           </div>
 
-          <label>Tipo de Prenda: </label>
-          {/* Corregido: En React se usa defaultValue o se maneja el string vacío directamente para evitar warnings */}
-          <select name="type" value={product.type} onChange={handleChange}>
-            <option value="" disabled>Seleccione un tipo</option>
-            <option value="Casaca">Casaca</option>
-            <option value="Medias">Medias</option>
-            <option value="Pantalon">Pantalon</option>
-            <option value="Polera">Polera</option>
-            <option value="Polo">Polo</option>
-            <option value="Shorts">Shorts</option>
-          </select>
-          <br />
+        </div>
 
         {/* POPUP - stays the same */}
         {showPopup && (
