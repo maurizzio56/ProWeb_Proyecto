@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Reincorporado useEffect para la persistencia
+import React, { useState, useEffect } from 'react';
 import Sidebar from './BarraLateral';
 import './inventario.css';
 
@@ -7,26 +7,30 @@ const Inventario = () => {
     name: '',
     marca: '',
     type: ''
-  }); 
-  
-  // Estado temporal para manejar el stock por talla de la prenda que se está creando
+  });
   const [tempSizes, setTempSizes] = useState([]);
-
-  // SOLUCIÓN: Inicializamos el estado cargando los productos desde el localStorage
-  const [products, setProducts] = useState(() => {
-    const savedProducts = localStorage.getItem('inventario_productos');
-    return savedProducts ? JSON.parse(savedProducts) : [];
-  }); 
-
-  const [selectedProduct, setSelectedProduct] = useState(null); 
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [showPopup, setPopup] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // SOLUCIÓN: Guardamos automáticamente en localStorage cada vez que cambie el arreglo de productos
+  // Cargar productos desde el backend
   useEffect(() => {
-    localStorage.setItem('inventario_productos', JSON.stringify(products));
-  }, [products]);
+    fetchProducts();
+  }, []);
 
-  // Cada vez que cambia el tipo de prenda en el select, generamos su matriz de tallas vacía
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/productos');
+      const data = await res.json();
+      setProducts(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error al cargar productos:', error);
+      setLoading(false);
+    }
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setProduct({ ...product, [name]: value });
@@ -36,61 +40,57 @@ const Inventario = () => {
     }
   };
 
-  // Maneja el cambio de stock específico de una talla en el formulario
   const handleStockChange = (index, value) => {
     const updatedTempSizes = [...tempSizes];
     updatedTempSizes[index] = [updatedTempSizes[index][0], Number(value) || 0];
     setTempSizes(updatedTempSizes);
   };
-    
-  const handleSubmit = (event) => {
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (product.name && product.marca && product.type) {
       const newProduct = {
-        ...product,           
-        sizes: tempSizes // Guardamos la matriz de tallas con los stocks reales ingresados    
+        ...product,
+        tallas: Object.fromEntries(tempSizes)
       };
-      setProducts([...products, newProduct]);
-      setProduct({
-        name: '',
-        marca: '',
-        type: ''
-      });
-      setTempSizes([]);
-      setPopup(false);
+
+      try {
+        const res = await fetch('http://localhost:5000/api/productos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newProduct)
+        });
+        const data = await res.json();
+        setProducts([...products, data]);
+        setProduct({ name: '', marca: '', type: '' });
+        setTempSizes([]);
+        setPopup(false);
+      } catch (error) {
+        console.error('Error al crear producto:', error);
+        alert('Error al crear producto');
+      }
     } else {
       alert('Por favor, complete todos los campos.');
     }
   };
 
-  const displayProduct = (item) => {
-    const index = products.findIndex(p => p === item);
-    return (
-      <div className="product-detail">
-        <h3>{item.name}</h3>
-        <p>Marca: {item.marca}</p>
-        <p>Tipo: {item.type}</p>
-        
-        <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead>
-            <tr>
-              <th>Talla</th>
-              <th>Stock</th>
-            </tr>
-          </thead>
-          <tbody>
-            {item.sizes.map((sizeTuple, index) => (
-              <tr key={index}>
-                <td>{sizeTuple[0]}</td>
-                <td>{sizeTuple[1]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <br />
-        <button className='btn-secundario' onClick={() => deleteProduct(index)} >Eliminar Producto</button>
-      </div>
-    );
+  const deleteProduct = async (index) => {
+    const productToDelete = products[index];
+    if (!window.confirm(`¿Eliminar ${productToDelete.name}?`)) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/productos/${productToDelete.id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        const updatedProducts = products.filter((_, i) => i !== index);
+        setProducts(updatedProducts);
+        setSelectedProduct(null);
+      }
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      alert('Error al eliminar producto');
+    }
   };
 
   const getSize = (type) => {
@@ -111,7 +111,7 @@ const Inventario = () => {
 
   const renderProductList = () => {
     return products.map((item, index) => (
-      <div key={index} className="product-item">
+      <div key={item.id || index} className="product-item">
         <button onClick={() => setSelectedProduct(item)} className="btn-producto">
           {item.name} - {item.type} - {item.marca}
         </button>
@@ -119,20 +119,21 @@ const Inventario = () => {
     ));
   };
 
-  const deleteProduct = (del) => {
-    const updatedProducts = products.filter((_, index) => index !== del);
-    setProducts(updatedProducts);
-    setSelectedProduct(null);
-  };
-
   const cancelReg = () => {
-    setProduct({
-      name: '',
-      marca: '',
-      type: ''
-    });
+    setProduct({ name: '', marca: '', type: '' });
     setTempSizes([]);
     setPopup(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="app-shell">
+        <Sidebar />
+        <main className="main-content">
+          <h2>Cargando productos...</h2>
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -143,8 +144,6 @@ const Inventario = () => {
         <p>Bienvenido al sistema de gestión de inventario</p>
 
         <div className="two-columns">
-          
-          {/* COLUMNA IZQUIERDA - Lista */}
           <div className="left-column">
             <div className="product-list-header">
               <h3>Lista de Productos</h3>
@@ -158,12 +157,41 @@ const Inventario = () => {
             </div>
           </div>
 
-          {/* COLUMNA DERECHA - Detalles */}
           <div className="right-column">
             {selectedProduct ? (
               <div className="product-detail-section">
                 <h3>Detalles del Producto</h3>
-                {displayProduct(selectedProduct)}
+                <div className="product-detail">
+                  <h3>{selectedProduct.name}</h3>
+                  <p>Marca: {selectedProduct.marca}</p>
+                  <p>Tipo: {selectedProduct.type}</p>
+                  <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <thead>
+                      <tr>
+                        <th>Talla</th>
+                        <th>Stock</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedProduct.tallas && Object.entries(selectedProduct.tallas).map(([talla, cantidad]) => (
+                        <tr key={talla}>
+                          <td>{talla}</td>
+                          <td>{cantidad}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <br />
+                  <button 
+                    className='btn-secundario' 
+                    onClick={() => {
+                      const index = products.findIndex(p => p.id === selectedProduct.id);
+                      deleteProduct(index);
+                    }}
+                  >
+                    Eliminar Producto
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="empty-state">
@@ -171,10 +199,8 @@ const Inventario = () => {
               </div>
             )}
           </div>
-
         </div>
 
-        {/* POPUP DE REGISTRO */}
         {showPopup && (
           <div className="popup-overlay">
             <div className="popup-content" style={{ maxWidth: '500px', maxHeight: '85vh', overflowY: 'auto' }}>
@@ -185,13 +211,11 @@ const Inventario = () => {
                   <input type="text" name="name" value={product.name} onChange={handleChange} required />
                 </label>
                 <br />
-          
                 <label>
                   Marca:
                   <input type="text" name="marca" value={product.marca} onChange={handleChange} required />
                 </label>
                 <br />
-
                 <label>Tipo de Prenda: </label>
                 <select name="type" value={product.type} onChange={handleChange} required>
                   <option value="" disabled>Seleccione tipo</option>
@@ -204,7 +228,6 @@ const Inventario = () => {
                 </select>
                 <br /><br />
 
-                {/* BLOQUE DINÁMICO: Formulario de cantidades por talla */}
                 {tempSizes.length > 0 && (
                   <div style={{ background: '#f8f9fa', padding: '16px', borderRadius: '8px', marginBottom: '15px' }}>
                     <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#374151' }}>Ingresar Cantidades por Talla:</h4>
@@ -227,7 +250,7 @@ const Inventario = () => {
 
                 <div className="popup-buttons">
                   <button type="submit" className="btn-primario">Crear</button>
-                  <button type="button" onClick={() => cancelReg()} className='btn-secundario'>Cancelar</button>
+                  <button type="button" onClick={cancelReg} className='btn-secundario'>Cancelar</button>
                 </div>
               </form>
             </div>

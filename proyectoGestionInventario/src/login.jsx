@@ -4,22 +4,35 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const storedUserData = localStorage.getItem(`user_${email}`);
-    const storedUser = storedUserData ? JSON.parse(storedUserData) : null;
+    setLoading(true);
 
-    if (email === 'admin@example.com' && password === 'admin123') {
-      localStorage.setItem('userRole', 'Administrador');
-      navigate('/dashboard');
-    } else if (storedUser && storedUser.password === password) {
-      localStorage.setItem('userRole', storedUser.role);
-      navigate('/dashboard');
-    } else {
-      alert('Credenciales inválidas');
+    try {
+      const res = await fetch('http://localhost:5000/api/usuarios/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem('userRole', data.rol);
+        localStorage.setItem('userName', data.nombre);
+        localStorage.setItem('userEmail', data.email);
+        localStorage.setItem('userId', data.id);
+        navigate('/dashboard');
+      } else {
+        alert(data.error || 'Credenciales inválidas');
+      }
+    } catch (error) {
+      alert('Error al conectar con el servidor');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,7 +51,7 @@ const Login = () => {
               type="email" 
               id="email" 
               className="input-formulario"
-              placeholder="admin@styleflow.com"
+              placeholder="admin@example.com"
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               required
@@ -51,15 +64,15 @@ const Login = () => {
               type="password" 
               id="password" 
               className="input-formulario"
-              placeholder="password"
+              placeholder="admin123"
               value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
-          <button type="submit" className="btn-primario" style={{ width: '100%', marginTop: '8px' }}>
-            Iniciar Sesión
+          <button type="submit" className="btn-primario" style={{ width: '100%', marginTop: '8px' }} disabled={loading}>
+            {loading ? 'Cargando...' : 'Iniciar Sesión'}
           </button>
         </form>
       </div>
