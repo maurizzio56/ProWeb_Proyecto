@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './BarraLateral';
 import './inventario.css';
+import { getProductos, createProducto, deleteProducto } from './api.js';
 
 const Inventario = () => {
   const [product, setProduct] = useState({
-    name: '',
-    marca: '',
-    type: ''
+  nombre: '',
+  marca: '',
+  tipo: ''
   });
   const [tempSizes, setTempSizes] = useState([]);
   const [products, setProducts] = useState([]);
@@ -14,15 +15,13 @@ const Inventario = () => {
   const [showPopup, setPopup] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Cargar productos desde el backend
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/productos');
-      const data = await res.json();
+      const data = await getProductos();
       setProducts(data);
       setLoading(false);
     } catch (error) {
@@ -35,7 +34,7 @@ const Inventario = () => {
     const { name, value } = event.target;
     setProduct({ ...product, [name]: value });
 
-    if (name === 'type') {
+    if (name === 'tipo') {
       setTempSizes(getSize(value));
     }
   };
@@ -48,48 +47,35 @@ const Inventario = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (product.name && product.marca && product.type) {
+    if (product.nombre && product.marca && product.tipo) {
       const newProduct = {
         ...product,
         tallas: Object.fromEntries(tempSizes)
       };
 
       try {
-        const res = await fetch('http://localhost:5000/api/productos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newProduct)
-        });
-        const data = await res.json();
+        const data = await createProducto(newProduct);
         setProducts([...products, data]);
-        setProduct({ name: '', marca: '', type: '' });
+        setProduct({ nombre: '', marca: '', tipo: '' });
         setTempSizes([]);
         setPopup(false);
       } catch (error) {
         console.error('Error al crear producto:', error);
-        alert('Error al crear producto');
       }
-    } else {
-      alert('Por favor, complete todos los campos.');
     }
   };
 
   const deleteProduct = async (index) => {
     const productToDelete = products[index];
-    if (!window.confirm(`¿Eliminar ${productToDelete.name}?`)) return;
+    if (!window.confirm(`¿Eliminar ${productToDelete.nombre}?`)) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/productos/${productToDelete.id}`, {
-        method: 'DELETE'
-      });
-      if (res.ok) {
-        const updatedProducts = products.filter((_, i) => i !== index);
-        setProducts(updatedProducts);
-        setSelectedProduct(null);
-      }
+      await deleteProducto(productToDelete.id);
+      const updatedProducts = products.filter((_, i) => i !== index);
+      setProducts(updatedProducts);
+      setSelectedProduct(null);
     } catch (error) {
       console.error('Error al eliminar producto:', error);
-      alert('Error al eliminar producto');
     }
   };
 
@@ -113,14 +99,14 @@ const Inventario = () => {
     return products.map((item, index) => (
       <div key={item.id || index} className="product-item">
         <button onClick={() => setSelectedProduct(item)} className="btn-producto">
-          {item.name} - {item.type} - {item.marca}
+          {item.nombre} - {item.tipo} - {item.marca}
         </button>
       </div>
     ));
   };
 
   const cancelReg = () => {
-    setProduct({ name: '', marca: '', type: '' });
+    setProduct({ nombre: '', marca: '', tipo: '' });
     setTempSizes([]);
     setPopup(false);
   };
@@ -162,9 +148,9 @@ const Inventario = () => {
               <div className="product-detail-section">
                 <h3>Detalles del Producto</h3>
                 <div className="product-detail">
-                  <h3>{selectedProduct.name}</h3>
+                  <h3>{selectedProduct.nombre}</h3>
                   <p>Marca: {selectedProduct.marca}</p>
-                  <p>Tipo: {selectedProduct.type}</p>
+                  <p>Tipo: {selectedProduct.tipo}</p>
                   <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                     <thead>
                       <tr>
@@ -183,7 +169,7 @@ const Inventario = () => {
                   </table>
                   <br />
                   <button 
-                    className='btn-secundario' 
+                    className='btn-eliminar' 
                     onClick={() => {
                       const index = products.findIndex(p => p.id === selectedProduct.id);
                       deleteProduct(index);
@@ -208,7 +194,7 @@ const Inventario = () => {
               <form onSubmit={handleSubmit}>
                 <label>
                   Nombre del Producto:
-                  <input type="text" name="name" value={product.name} onChange={handleChange} required />
+                  <input type="text" name="nombre" value={product.nombre} onChange={handleChange} required />
                 </label>
                 <br />
                 <label>
@@ -217,7 +203,7 @@ const Inventario = () => {
                 </label>
                 <br />
                 <label>Tipo de Prenda: </label>
-                <select name="type" value={product.type} onChange={handleChange} required>
+                <select name="tipo" value={product.tipo} onChange={handleChange} required>
                   <option value="" disabled>Seleccione tipo</option>
                   <option value="Casaca">Casaca</option>
                   <option value="Medias">Medias</option>
@@ -250,7 +236,7 @@ const Inventario = () => {
 
                 <div className="popup-buttons">
                   <button type="submit" className="btn-primario">Crear</button>
-                  <button type="button" onClick={cancelReg} className='btn-secundario'>Cancelar</button>
+                  <button type="button" onClick={cancelReg} className='btn-cancelar'>Cancelar</button>
                 </div>
               </form>
             </div>
