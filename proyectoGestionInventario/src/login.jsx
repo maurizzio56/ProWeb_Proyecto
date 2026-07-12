@@ -33,7 +33,7 @@ const Login = () => {
         localStorage.setItem('userName', data.nombre);
         localStorage.setItem('userEmail', data.email);
         localStorage.setItem('userId', data.id);
-        navigate('/dashboard');
+        window.location.href = '/dashboard';
       } else {
         setError(data.error || 'Credenciales inválidas');
       }
