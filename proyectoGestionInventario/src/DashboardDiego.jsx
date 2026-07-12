@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'; // Se importó useEffect
+import React, { useState, useEffect } from 'react';
 import Sidebar from './BarraLateral';
+import { getDashboardResumen } from './api';
 
 export default function DashboardDiego() {
-    // Estado dinámico inicializado con arrays vacíos y contadores en 0
     const [metrics, setMetrics] = useState({
         totalProductos: 0,
         stockBajo: 0,
@@ -11,66 +11,34 @@ export default function DashboardDiego() {
             { nombre: 'Polos', cantidad: 0, color: '#3498db' },
             { nombre: 'Pantalones', cantidad: 0, color: '#2ecc71' },
             { nombre: 'Casacas', cantidad: 0, color: '#9b59b6' },
-            { nombre: 'Shorts', cantidad: 0, color: '#f1c40f' } // Cambiado a Shorts para emparejar tu select
+            { nombre: 'Shorts', cantidad: 0, color: '#f1c40f' }
         ],
         alertasStock: []
     });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // 1. Obtener productos reales de localStorage
-        const savedProducts = localStorage.getItem('inventario_productos');
-        const productosReales = savedProducts ? JSON.parse(savedProducts) : [];
-
-        let contadorStockBajo = 0;
-        let conteoPolos = 0;
-        let conteoPantalones = 0;
-        let conteoCasacas = 0;
-        let conteoShorts = 0;
-        const nuevasAlertas = [];
-
-        // 2. Procesar cada producto del inventario
-        productosReales.forEach((prod, index) => {
-            let stockTotalProducto = 0;
-
-            // Sumar el stock de todas sus tallas
-            if (prod.sizes && Array.isArray(prod.sizes)) {
-                prod.sizes.forEach(([talla, cantidad]) => {
-                    stockTotalProducto += Number(cantidad);
-                });
-            }
-
-            // Acumular cantidades por categoría según el 'type' del formulario
-            if (prod.type === 'Polo' || prod.type === 'Polera') conteoPolos += stockTotalProducto;
-            if (prod.type === 'Pantalon') conteoPantalones += stockTotalProducto;
-            if (prod.type === 'Casaca') conteoCasacas += stockTotalProducto;
-            if (prod.type === 'Shorts') conteoShorts += stockTotalProducto;
-
-            // Determinar si el producto tiene stock bajo (Por ejemplo, menos de 5 unidades en total)
-            if (stockTotalProducto < 5) {
-                contadorStockBajo++;
-                nuevasAlertas.push({
-                    id: index + 1,
-                    producto: `${prod.name} (${prod.marca})`,
-                    stock: stockTotalProducto,
-                    estado: stockTotalProducto === 0 ? 'Crítico' : 'Atención'
-                });
-            }
-        });
-
-        // 3. Actualizar el estado con los cálculos reales del negocio
-        setMetrics({
-            totalProductos: productosReales.length,
-            stockBajo: contadorStockBajo,
-            productosAgregadosHoy: productosReales.length > 0 ? 1 : 0, // Simulación representativa
-            categorias: [
-                { nombre: 'Polos / Poleras', cantidad: conteoPolos, color: '#3498db' },
-                { nombre: 'Pantalones', cantidad: conteoPantalones, color: '#2ecc71' },
-                { nombre: 'Casacas', cantidad: conteoCasacas, color: '#9b59b6' },
-                { nombre: 'Shorts', cantidad: conteoShorts, color: '#f1c40f' }
-            ],
-            alertasStock: nuevasAlertas.slice(0, 5) // Mostrar máximo las 5 principales alertas
-        });
+        getDashboardResumen()
+            .then(data => {
+                setMetrics(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error('Error al cargar dashboard:', err);
+                setLoading(false);
+            });
     }, []);
+
+    if (loading) {
+        return (
+            <div className="app-shell">
+                <Sidebar />
+                <main className="main-content">
+                    <h2>Cargando dashboard...</h2>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="app-shell">
@@ -79,7 +47,6 @@ export default function DashboardDiego() {
                 <div style={estilos.contenedor}>
                     <h2 style={estilos.tituloPrincipal}>Panel de Control e Indicadores</h2>
                     
-                    {/* Tarjetas Superiores */}
                     <div style={estilos.bloqueTarjetas}>
                         <div style={{ ...estilos.tarjeta, ...estilos.tarjetaNormal }}>
                             <span style={estilos.numeroMetric}>{metrics.totalProductos}</span>
@@ -95,11 +62,9 @@ export default function DashboardDiego() {
                         </div>
                     </div>
 
-                    {/* Sección de Gráficos de Categorías */}
                     <div style={estilos.cajaGrafico}>
                         <h3 style={estilos.subtitulo}>Distribución de Stock Físico por Categoría</h3>
                         {metrics.categorias.map((cat, index) => {
-                            // Cálculo dinámico del porcentaje para la barra de progreso
                             const maxUnidadesReferencia = 100; 
                             const porcentaje = Math.min((cat.cantidad / maxUnidadesReferencia) * 100, 100);
 
@@ -119,7 +84,6 @@ export default function DashboardDiego() {
                         })}
                     </div>
 
-                    {/* Tabla de Alertas de Stock Crítico */}
                     <div style={estilos.cajaGrafico}>
                         <h3 style={estilos.subtitulo}>Productos con Bajo Stock (Alertas Reales)</h3>
                         <table style={estilos.tabla}>
@@ -163,7 +127,6 @@ export default function DashboardDiego() {
     );
 }
 
-// Los estilos de Diego se mantienen exactamente iguales abajo
 const estilos = {
     contenedor: { padding: '20px', backgroundColor: '#f8f9fa', minHeight: '100vh', fontFamily: 'sans-serif' },
     tituloPrincipal: { color: '#2c3e50', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', marginBottom: '20px' },
