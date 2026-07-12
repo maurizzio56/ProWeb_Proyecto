@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from './BarraLateral';
-import solicitudesData from './data/solicitudes.json';
+import {
+  getSolicitudes,
+  createSolicitud,
+  updateSolicitud,
+} from './api';
 import './solicitudes.css';
 
 const Solicitudes = () => {
@@ -11,26 +15,74 @@ const Solicitudes = () => {
   const [cantidad, setCantidad] = useState('');
   const [prioridad, setPrioridad] = useState('Alta');
   const [talla, setTalla] = useState('');
-  const [solicitudes, setSolicitudes] = useState(() => {
-    const datosGuardados = localStorage.getItem('solicitudes');
-    return datosGuardados ? JSON.parse(datosGuardados) : solicitudesData;
-    });
+  const [solicitudes, setSolicitudes] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [mensajeError, setMensajeError] = useState('');
+
+  const cargarSolicitudes = async () => {
+    try {
+      setCargando(true);
+      setMensajeError('');
+
+      const datos = await getSolicitudes();
+      setSolicitudes(datos);
+    } catch (error) {
+      console.error('Error al cargar solicitudes:', error);
+      setMensajeError('No se pudieron cargar las solicitudes.');
+    } finally {
+      setCargando(false);
+    }
+  };
+
   useEffect(() => {
-  localStorage.setItem('solicitudes', JSON.stringify(solicitudes));
-  }, [solicitudes]);
+    cargarSolicitudes();
+  }, []);
 
-  const cambiarEstado = (index, nuevoEstado) => {
-    const solicitudesActualizadas = solicitudes.map((item, i) => {
-      if (i === index) {
-        return {
-          ...item,
-          estado: nuevoEstado,
-        };
-      }
-      return item;
-    });
+  const guardarSolicitud = async () => {
+    if (!producto.trim() || !talla.trim() || !cantidad) {
+      alert('Completa producto, talla y cantidad.');
+      return;
+    }
 
-    setSolicitudes(solicitudesActualizadas);
+    if (Number(cantidad) <= 0) {
+      alert('La cantidad debe ser mayor que cero.');
+      return;
+    }
+
+    try {
+      const nuevaSolicitud = {
+        producto: producto.trim(),
+        talla: talla.trim(),
+        cantidad: Number(cantidad),
+        prioridad,
+        usuario_id: 1,
+      };
+
+      await createSolicitud(nuevaSolicitud);
+      await cargarSolicitudes();
+
+      setProducto('');
+      setCantidad('');
+      setPrioridad('Alta');
+      setTalla('');
+      setMostrarFormulario(false);
+    } catch (error) {
+      console.error('Error al crear la solicitud:', error);
+      alert('No se pudo guardar la solicitud.');
+    }
+  };
+
+  const cambiarEstado = async (id, nuevoEstado) => {
+    try {
+      await updateSolicitud(id, {
+        estado: nuevoEstado,
+      });
+
+      await cargarSolicitudes();
+    } catch (error) {
+      console.error('Error al cambiar el estado:', error);
+      alert('No se pudo actualizar el estado.');
+    }
   };
 
   return (
@@ -49,6 +101,8 @@ const Solicitudes = () => {
           </button>
         </div>
 
+        {mensajeError && <p>{mensajeError}</p>}
+
         <div className="tabla-card">
           <table className="tabla-solicitudes">
             <thead>
@@ -63,39 +117,61 @@ const Solicitudes = () => {
             </thead>
 
             <tbody>
-              {solicitudes.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.producto}</td>
-                  <td>{item.talla}</td>
-                  <td>{item.cantidad}</td>
-                  <td>{item.prioridad}</td>
-                  <td>{item.estado}</td>
-
-                  {userRole === 'Administrador' && (
-                    <td>
-                      {item.estado === 'Pendiente de aprobación' ? (
-                        <>
-                          <button
-                            className="btn-aprobar"
-                            onClick={() => cambiarEstado(index, 'Aprobada')}
-                          >
-                            Aprobar
-                          </button>
-
-                          <button
-                            className="btn-rechazar"
-                            onClick={() => cambiarEstado(index, 'Rechazada')}
-                          >
-                            Rechazar
-                          </button>
-                        </>
-                      ) : (
-                        <span>Sin acciones</span>
-                      )}
-                    </td>
-                  )}
+              {cargando ? (
+                <tr>
+                  <td
+                    colSpan={userRole === 'Administrador' ? 6 : 5}
+                  >
+                    Cargando solicitudes...
+                  </td>
                 </tr>
-              ))}
+              ) : solicitudes.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={userRole === 'Administrador' ? 6 : 5}
+                  >
+                    No hay solicitudes registradas.
+                  </td>
+                </tr>
+              ) : (
+                solicitudes.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.producto}</td>
+                    <td>{item.talla}</td>
+                    <td>{item.cantidad}</td>
+                    <td>{item.prioridad}</td>
+                    <td>{item.estado}</td>
+
+                    {userRole === 'Administrador' && (
+                      <td>
+                        {item.estado === 'Pendiente de aprobación' ? (
+                          <>
+                            <button
+                              className="btn-aprobar"
+                              onClick={() =>
+                                cambiarEstado(item.id, 'Aprobada')
+                              }
+                            >
+                              Aprobar
+                            </button>
+
+                            <button
+                              className="btn-rechazar"
+                              onClick={() =>
+                                cambiarEstado(item.id, 'Rechazada')
+                              }
+                            >
+                              Rechazar
+                            </button>
+                          </>
+                        ) : (
+                          <span>Sin acciones</span>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -126,6 +202,7 @@ const Solicitudes = () => {
                 placeholder="Cantidad"
                 className="input-formulario"
                 value={cantidad}
+                min="1"
                 onChange={(e) => setCantidad(e.target.value)}
               />
 
@@ -142,23 +219,7 @@ const Solicitudes = () => {
               <div className="botones-modal">
                 <button
                   className="btn-guardar"
-                  onClick={() => {
-                    const nuevaSolicitud = {
-                      producto: producto,
-                      talla: talla,
-                      cantidad: cantidad,
-                      prioridad: prioridad,
-                      estado: 'Pendiente de aprobación',
-                    };
-
-                    setSolicitudes([...solicitudes, nuevaSolicitud]);
-
-                    setProducto('');
-                    setCantidad('');
-                    setPrioridad('Alta');
-                    setTalla('');
-                    setMostrarFormulario(false);
-                  }}
+                  onClick={guardarSolicitud}
                 >
                   Guardar
                 </button>
