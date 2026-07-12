@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './BarraLateral';
 
 const productOptions = [
@@ -26,89 +26,57 @@ const Proveedores = () => {
     otherProduct: ''
   });
 
-  // DATOS INICIALES
-  const [providers, setProviders] = useState([
-
-    {
-      providerType: 'Empresa',
-      name: 'Textiles Perú SAC',
-      documentType: '',
-      documentNumber: '',
-      ruc: '20605478963',
-      contact: '+51 987 654 321',
-      products: ['Polos', 'Casacas'],
-      otherProduct: ''
-    },
-
-    {
-      providerType: 'Persona',
-      name: 'Juan Pérez',
-      documentType: 'DNI',
-      documentNumber: '74859632',
-      ruc: '',
-      contact: 'juanperez@gmail.com',
-      products: ['Gorras', 'Accesorios'],
-      otherProduct: ''
-    },
-
-    {
-      providerType: 'Empresa',
-      name: 'Moda Urbana SAC',
-      documentType: '',
-      documentNumber: '',
-      ruc: '20547896321',
-      contact: '+51 955 111 222',
-      products: ['Pantalones', 'Zapatillas'],
-      otherProduct: ''
-    }
-
-  ]);
+  // DATOS
+  const [providers, setProviders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // FILTROS
   const [filterProduct, setFilterProduct] = useState('Todos');
   const [filterType, setFilterType] = useState('Todos');
 
-  // ── NUEVO: estado para el modal de confirmación ──────────────────────────
-  // Guarda el índice del proveedor que se quiere eliminar (null = modal cerrado)
   const [confirmDelete, setConfirmDelete] = useState(null);
-  // ─────────────────────────────────────────────────────────────────────────
+
+  // CARGAR PROVEEDORES DESDE EL BACKEND
+  useEffect(() => {
+    fetch('http://localhost:5000/api/proveedores')
+      .then(res => res.json())
+      .then(data => {
+        setProviders(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error al cargar proveedores:', err);
+        setLoading(false);
+      });
+  }, []);
 
   // INPUTS
   function handleChange(event) {
-
     setProvider({
       ...provider,
       [event.target.name]: event.target.value
     });
-
   }
 
   // CHECKBOX PRODUCTOS
   function handleProductChange(product) {
-
     if (provider.products.includes(product)) {
-
       setProvider({
         ...provider,
         products: provider.products.filter(function (p) {
           return p !== product;
         })
       });
-
     } else {
-
       setProvider({
         ...provider,
         products: [...provider.products, product]
       });
-
     }
-
   }
 
-  // REGISTRAR
+  // REGISTRAR (con backend)
   function handleSubmit(event) {
-
     event.preventDefault();
 
     if (
@@ -117,72 +85,97 @@ const Proveedores = () => {
       provider.contact &&
       provider.products.length > 0
     ) {
+      const newProvider = {
+        nombre: provider.name,
+        tipo: provider.providerType,
+        documento: provider.providerType === 'Persona' ? provider.documentNumber : provider.ruc,
+        contacto: provider.contact,
+        productos: provider.products,
+        otros_productos: provider.otherProduct || null,
+      };
 
-      setProviders([...providers, provider]);
-
-      setProvider({
-        providerType: '',
-        name: '',
-        documentType: '',
-        documentNumber: '',
-        ruc: '',
-        contact: '',
-        products: [],
-        otherProduct: ''
-      });
+      fetch('http://localhost:5000/api/proveedores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProvider)
+      })
+        .then(res => res.json())
+        .then(data => {
+          setProviders([...providers, data]);
+          setProvider({
+            providerType: '',
+            name: '',
+            documentType: '',
+            documentNumber: '',
+            ruc: '',
+            contact: '',
+            products: [],
+            otherProduct: ''
+          });
+        })
+        .catch(err => {
+          console.error('Error al crear proveedor:', err);
+          alert('Error al crear proveedor');
+        });
 
     } else {
-
       alert('Complete todos los campos');
-
     }
-
   }
 
-  // ── NUEVO: abre el modal en lugar de eliminar directamente ───────────────
+  // ELIMINAR (con backend)
   function handleDelete(index) {
     setConfirmDelete(index);
   }
-  // ─────────────────────────────────────────────────────────────────────────
 
-  // ── NUEVO: ejecuta la eliminación real cuando el usuario confirma ────────
   function confirmDeleteAction() {
+    const providerToDelete = providers[confirmDelete];
 
-    const updatedProviders = providers.filter(function (_, i) {
-      return i !== confirmDelete;
-    });
-
-    setProviders(updatedProviders);
-    setConfirmDelete(null);
-
+    fetch(`http://localhost:5000/api/proveedores/${providerToDelete.id}`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        const updatedProviders = providers.filter(function (_, i) {
+          return i !== confirmDelete;
+        });
+        setProviders(updatedProviders);
+        setConfirmDelete(null);
+      })
+      .catch(err => {
+        console.error('Error al eliminar proveedor:', err);
+        alert('Error al eliminar proveedor');
+        setConfirmDelete(null);
+      });
   }
-  // ─────────────────────────────────────────────────────────────────────────
 
-  // ── NUEVO: cancela y cierra el modal ─────────────────────────────────────
   function cancelDelete() {
     setConfirmDelete(null);
   }
-  // ─────────────────────────────────────────────────────────────────────────
 
   // FILTRADO
   let filteredProviders = providers;
 
-  // PRODUCTO
   if (filterProduct !== 'Todos') {
-
     filteredProviders = filteredProviders.filter(function (provider) {
-      return provider.products.includes(filterProduct);
+      return provider.productos?.includes(filterProduct);
     });
-
   }
 
-  // TIPO
   if (filterType !== 'Todos') {
-
     filteredProviders = filteredProviders.filter(function (provider) {
-      return provider.providerType === filterType;
+      return provider.tipo === filterType;
     });
+  }
 
+  if (loading) {
+    return (
+      <div className="app-shell">
+        <Sidebar />
+        <main className="main-content">
+          <h2>Cargando proveedores...</h2>
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -598,41 +591,39 @@ const Proveedores = () => {
 
                     return (
 
-                      <tr key={index}>
+                      <tr key={item.id || index}>
 
                         <td style={{ fontWeight: '500' }}>
-                          {item.name}
+                          {item.nombre}
                         </td>
 
                         <td>
-                          {item.providerType}
-                        </td>
-
-                        <td>
-
-                          {item.providerType === 'Persona'
-                            ? item.documentType + ': ' + item.documentNumber
-                            : 'RUC: ' + item.ruc}
-
-                        </td>
-
-                        <td>
-                          {item.contact}
+                          {item.tipo}
                         </td>
 
                         <td>
 
-                          {item.products.map(function (p, i) {
+                          {item.documento || '-'}
+
+                        </td>
+
+                        <td>
+                          {item.contacto}
+                        </td>
+
+                        <td>
+
+                          {item.productos?.map(function (p, i) {
 
                             return (
 
                               <span key={i}>
 
                                 {p === 'Otros'
-                                  ? 'Otros: ' + item.otherProduct
+                                  ? 'Otros: ' + item.otros_productos
                                   : p}
 
-                                {i < item.products.length - 1 && ', '}
+                                {i < item.productos.length - 1 && ', '}
 
                               </span>
 
@@ -642,7 +633,6 @@ const Proveedores = () => {
 
                         </td>
 
-                        {/* ── MODIFICADO: ahora llama a handleDelete que abre el modal ── */}
                         <td>
 
                           <button
@@ -663,7 +653,6 @@ const Proveedores = () => {
                           </button>
 
                         </td>
-                        {/* ───────────────────────────────────────────────────────────── */}
 
                       </tr>
 
@@ -698,7 +687,7 @@ const Proveedores = () => {
 
       </main>
 
-      {/* ── NUEVO: Modal de confirmación de eliminación ──────────────────────── */}
+      {/* MODAL DE CONFIRMACIÓN */}
       {confirmDelete !== null && (
 
         <div
@@ -725,7 +714,6 @@ const Proveedores = () => {
             }}
           >
 
-            {/* Ícono de advertencia */}
             <div
               style={{
                 fontSize: '48px',
@@ -755,7 +743,7 @@ const Proveedores = () => {
               }}
             >
               Estás a punto de eliminar al proveedor{' '}
-              <strong>{providers[confirmDelete]?.name}</strong>.
+              <strong>{providers[confirmDelete]?.nombre}</strong>.
               Esta acción no se puede deshacer.
             </p>
 
@@ -767,7 +755,6 @@ const Proveedores = () => {
               }}
             >
 
-              {/* Botón Cancelar */}
               <button
                 onClick={cancelDelete}
                 style={{
@@ -784,7 +771,6 @@ const Proveedores = () => {
                 Cancelar
               </button>
 
-              {/* Botón Sí, eliminar */}
               <button
                 onClick={confirmDeleteAction}
                 style={{
@@ -808,7 +794,6 @@ const Proveedores = () => {
         </div>
 
       )}
-      {/* ─────────────────────────────────────────────────────────────────────── */}
 
     </div>
 
